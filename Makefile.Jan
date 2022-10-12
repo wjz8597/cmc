@@ -1,0 +1,43 @@
+'.SUFFICES: .C
+
+#CC = g++ -g -Wall -pedantic
+#CC = g++ -O3 -Wall -pedantic
+#CC = g++ -O3 -Wall -pedantic -mcpu=powerpc
+CC = g++ -O3 -Wall -pedantic -march=pentium4 -funroll-loops 
+
+# Please set the SPRNG_ROOT environment variable to the
+# directory for the SPRNG libraries.
+# SPRNG20_ROOT = /home/glvorberger/Burkhard/cmc/sprng2.0
+INC_SPRNG = -I$(SPRNG20_ROOT)/SRC
+LIB_SPRNG = -L$(SPRNG20_ROOT) -L$(SPRNG20_ROOT)/lib -lsprng
+
+INCLUDES = $(INC_SPRNG)
+#LIBS = $(LIB_SPRNG) -lm -static
+LIBS = $(LIB_SPRNG) -lm
+FLAGS = -c
+
+#Compiler rule for c++ compiler.
+.C.o :
+	$(CC) $(FLAGS) $(INCLUDES) $<
+.cc.o :
+	$(CC) $(FLAGS) $(INCLUDES) $<
+
+CMC_OBJ =  Random.o Standard.o PeriodicPoint.o BasicPoint.o Ewald.o AccRatio.o\
+	CMC.o Sampling.o PrintErrorBar.o InitialPos.o GOfR.o Histogram.o Physics.o\
+	MatrixAlgebra.o Timer.o Spline.o Form.o
+
+cmc: $(CMC_OBJ)
+	$(CC) -o cmc $(CMC_OBJ) $(LIBS) 
+
+DAL_OBJ =  Daligault_Fit.o Standard.o 
+
+dal: $(DAL_OBJ)
+	$(CC) -o dal $(DAL_OBJ) $(LIBS) 
+
+clean:	
+	rm -f *.o *.ii *.ti cmc dal
+
+depend :
+	perl ./listdepend_origin.scr mydependencies.txt
+
+include mydependencies.txt
